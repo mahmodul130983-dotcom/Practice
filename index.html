@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>৬০ নম্বরের MCQ পরীক্ষা - নেগেটিভ মার্কিং সহ</title>
+  <style>
+    :root {
+      --bg-color: #f1f5f9;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #cbd5e1;
+      --primary-color: #4f46e5;
+      --primary-hover: #4338ca;
+      --correct-bg: #dcfce7;
+      --correct-border: #22c55e;
+      --correct-text: #15803d;
+      --wrong-bg: #fee2e2;
+      --wrong-border: #ef4444;
+      --wrong-text: #b91c1c;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .quiz-card {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 650px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      padding: 32px;
+      position: relative;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .progress-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--primary-color);
+      background: rgba(79, 70, 229, 0.1);
+      padding: 6px 14px;
+      border-radius: 20px;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background-color: var(--border-color);
+      border-radius: 10px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background-color: var(--primary-color);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .question-title {
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.4;
+      margin-bottom: 20px;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-btn {
+      width: 100%;
+      padding: 14px 18px;
+      font-size: 16px;
+      text-align: left;
+      background: transparent;
+      color: var(--text-main);
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: var(--primary-color);
+      background-color: rgba(79, 70, 229, 0.05);
+    }
+
+    .option-btn.correct {
+      background-color: var(--correct-bg) !important;
+      border-color: var(--correct-border) !important;
+      color: var(--correct-text) !important;
+      font-weight: 600;
+    }
+
+    .option-btn.wrong {
+      background-color: var(--wrong-bg) !important;
+      border-color: var(--wrong-border) !important;
+      color: var(--wrong-text) !important;
+      font-weight: 600;
+    }
+
+    .explanation-box {
+      margin-top: 20px;
+      padding: 16px;
+      background-color: rgba(79, 70, 229, 0.05);
+      border-left: 4px solid var(--primary-color);
+      border-radius: 6px;
+      display: none;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .footer-actions {
+      margin-top: 28px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .next-btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px 28px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .next-btn:hover {
+      background-color: var(--primary-hover);
+    }
+
+    /* রেজাল্ট স্ক্রিন */
+    .result-screen {
+      text-align: center;
+      display: none;
+    }
+
+    .score-circle {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: rgba(79, 70, 229, 0.1);
+      color: var(--primary-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 20px auto;
+      font-size: 36px;
+      font-weight: 800;
+    }
+
+    .score-details {
+      display: flex;
+      justify-content: space-around;
+      margin: 20px 0;
+      background: #f8fafc;
+      padding: 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+    }
+
+    .restart-btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-card">
+    
+    <!-- কুইজ অংশ -->
+    <div id="quiz-view">
+      <div class="top-bar">
+        <h2>MCQ পরীক্ষা</h2>
+        <span class="progress-text" id="progress-text">প্রশ্ন ১/৬০</span>
+      </div>
+
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+
+      <div class="question-title" id="question-title">প্রশ্ন লোড হচ্ছে...</div>
+
+      <div class="options-grid" id="options-grid"></div>
+
+      <div class="explanation-box" id="explanation-box">
+        <strong>উত্তর ও ব্যাখ্যা:</strong> <span id="explanation-text"></span>
+      </div>
+
+      <div class="footer-actions">
+        <button class="next-btn" id="next-btn" onclick="handleNextQuestion()">পরবর্তী প্রশ্ন ➔</button>
+      </div>
+    </div>
+
+    <!-- শেষ পেজের রেজাল্ট অংশ -->
+    <div class="result-screen" id="result-view">
+      <h2>পরীক্ষা সমাপ্ত!</h2>
+      <p style="color: var(--text-muted)">৬০টি প্রশ্নের উত্তর সম্পন্ন হয়েছে</p>
+      
+      <div class="score-circle">
+        <div id="final-score">০.০০</div>
+        <span style="font-size: 14px; color: var(--text-muted);">মোট স্কোর / ৬০</span>
+      </div>
+
+      <div class="score-details">
+        <div><strong style="color: var(--correct-border); font-size: 20px;" id="correct-count">০</strong><br><small>সঠিক (+১.০০)</small></div>
+        <div><strong style="color: var(--wrong-border); font-size: 20px;" id="wrong-count">০</strong><br><small>ভুল (-০.২৫)</small></div>
+      </div>
+
+      <p id="result-message" style="font-size: 18px; font-weight: 600; margin-bottom: 10px;"></p>
+
+      <button class="restart-btn" onclick="restartQuiz()">পুনরায় পরীক্ষা দিন</button>
+    </div>
+
+  </div>
+
+  <script>
+    // 🔴 এখানে আপনার ৬০টি প্রশ্ন যোগ করবেন
+    const questionsDatabase = [
+      {
+        question: "১. বাংলাদেশের রাজধানী কোনটি?",
+        options: ["চট্টগ্রাম", "ঢাকা", "সিলেট", "রাজশাহী"],
+        correct: 1, // সঠিক উত্তর: ঢাকা (index 1)
+        explanation: "সঠিক উত্তর হলো ঢাকা।"
+      },
+      {
+        question: "২. কম্পিউটারের মস্তিষ্ক কাকে বলা হয়?",
+        options: ["RAM", "Hard Disk", "CPU", "Monitor"],
+        correct: 2, // সঠিক উত্তর: CPU (index 2)
+        explanation: "সঠিক উত্তর হলো CPU (Central Processing Unit)।"
+      },
+      {
+        question: "৩. পানির রাসায়নিক সংকেত কোনটি?",
+        options: ["CO2", "H2O", "NaCl", "O2"],
+        correct: 1, // সঠিক উত্তর: H2O (index 1)
+        explanation: "সঠিক উত্তর হলো H2O।"
+      }
+      // ⚠️ একইভাবে ৪ থেকে ৬০ নম্বর পর্যন্ত প্রশ্নগুলো সাজাবেন...
+    ];
+
+    let currentQuestionIndex = 0;
+    let totalScore = 0;
+    let correctCount = 0;
+    let wrongCount = 0;
+
+    const quizView = document.getElementById('quiz-view');
+    const resultView = document.getElementById('result-view');
+    const questionTitle = document.getElementById('question-title');
+    const optionsGrid = document.getElementById('options-grid');
+    const explanationBox = document.getElementById('explanation-box');
+    const explanationText = document.getElementById('explanation-text');
+    const nextBtn = document.getElementById('next-btn');
+    const progressText = document.getElementById('progress-text');
+    const progressBar = document.getElementById('progress-bar');
+
+    function loadQuestion() {
+      const currentData = questionsDatabase[currentQuestionIndex];
+
+      explanationBox.style.display = 'none';
+      nextBtn.style.display = 'none';
+      optionsGrid.innerHTML = '';
+
+      progressText.innerText = `প্রশ্ন ${currentQuestionIndex + 1}/${questionsDatabase.length}`;
+      const progressPercent = ((currentQuestionIndex + 1) / questionsDatabase.length) * 100;
+      progressBar.style.width = `${progressPercent}%`;
+
+      questionTitle.innerText = currentData.question;
+
+      currentData.options.forEach((option, index) => {
+        const button = document.createElement('button');
+        button.className = 'option-btn';
+        button.innerText = option;
+        button.onclick = () => selectOption(index, button);
+        optionsGrid.appendChild(button);
+      });
+    }
+
+    function selectOption(selectedIndex, selectedBtn) {
+      const currentData = questionsDatabase[currentQuestionIndex];
+      const allButtons = optionsGrid.querySelectorAll('.option-btn');
+
+      // বাটনগুলো লক করা
+      allButtons.forEach(btn => btn.disabled = true);
+
+      // মার্কিং লজিক
+      if (selectedIndex === currentData.correct) {
+        selectedBtn.classList.add('correct');
+        totalScore += 1;
+        correctCount++;
+      } else {
+        selectedBtn.classList.add('wrong');
+        // ভুল উত্তর দিলে সাথে সাথেই সঠিক উত্তর সবুজ রঙে হাইলাইট হবে
+        allButtons[currentData.correct].classList.add('correct');
+        totalScore -= 0.25; // ভুল হলে ০.২৫ কাটা
+        wrongCount++;
+      }
+
+      // সঠিক উত্তর ও ব্যাখ্যা সাথে সাথেই নিচে প্রদর্শিত হবে
+      explanationText.innerText = currentData.explanation;
+      explanationBox.style.display = 'block';
+
+      nextBtn.style.display = 'block';
+    }
+
+    function handleNextQuestion() {
+      currentQuestionIndex++;
+
+      if (currentQuestionIndex < questionsDatabase.length) {
+        loadQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      quizView.style.display = 'none';
+      resultView.style.display = 'block';
+
+      // স্কোর প্রদর্শন (দশমিক ২ স্থান পর্যন্ত)
+      document.getElementById('final-score').innerText = totalScore.toFixed(2);
+      document.getElementById('correct-count').innerText = correctCount;
+      document.getElementById('wrong-count').innerText = wrongCount;
+
+      const messageElement = document.getElementById('result-message');
+      const percentage = (totalScore / questionsDatabase.length) * 100;
+
+      if (percentage >= 70) {
+        messageElement.innerText = "অসাধারণ ফলাফল করেছেন! 🏆";
+        messageElement.style.color = "#16a34a";
+      } else if (percentage >= 40) {
+        messageElement.innerText = "ভালো হয়েছে! আরও একটু প্র্যাকটিস করুন। 👍";
+        messageElement.style.color = "#2563eb";
+      } else {
+        messageElement.innerText = "নেগেটিভ মার্কিংয়ের কারণে স্কোর কমেছে, ভালো করে প্রস্তুতি নিন। 💪";
+        messageElement.style.color = "#dc2626";
+      }
+    }
+
+    function restartQuiz() {
+      currentQuestionIndex = 0;
+      totalScore = 0;
+      correctCount = 0;
+      wrongCount = 0;
+      resultView.style.display = 'none';
+      quizView.style.display = 'block';
+      loadQuestion();
+    }
+
+    loadQuestion();
+  </script>
+</body>
+</html>
